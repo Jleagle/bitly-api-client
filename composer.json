@@ -1,0 +1,28 @@
+{
+  "name":        "jleagle/bitly",
+  "keywords":    [
+    "bitly",
+    "api",
+    "client",
+    "wrapper"
+  ],
+  "description": "Bitly API client.",
+  "authors":     [
+    {
+      "name":     "James Eagle",
+      "email":    "jimeagle@gmail.com",
+      "homepage": "http://jimeagle.com"
+    }
+  ],
+  "autoload":    {
+    "psr-4": {
+      "Jleagle\\": "src"
+    }
+  },
+  "require":     {
+    "php":               ">=5.4.0",
+    "packaged/helpers":  "dev-master",
+    "guzzlehttp/guzzle": "~4.0"
+  },
+  "require-dev": {}
+}
