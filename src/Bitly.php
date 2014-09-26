@@ -77,7 +77,8 @@ class Bitly
   }
 
   /**
-   * Returns a specified number of "high-value" Bitlinks that are popular across bitly at this particular moment.
+   * Returns a specified number of "high-value" Bitlinks that are popular
+   * across bitly at this particular moment.
    *
    * @param int $limit - The maximum number of high-value links to return.
    *
@@ -94,13 +95,44 @@ class Bitly
     return $this->_checkStatusCode($return);
   }
 
-  public function search()
+  /**
+   * @param string   $query      - string to query for.
+   * @param int      $limit      - the maximum number of links to return.
+   * @param int      $offset     - which result to start with (defaults to 0).
+   * @param string   $lang       - favor results in this language (two letter ISO code).
+   * @param string   $cities     - show links active in this city (ordered like country-state-city, e.g. us-il-chicago).
+   * @param string   $domain     - restrict results to this web domain (like bitly.com).
+   * @param string   $fullDomain - restrict results to this full web domain (like blog.bitly.com).
+   * @param string[] $fields     - fields - which fields to return in the response. An array of SearchFieldEnum constants
+   *
+   * @return \stdClass[]
+   */
+  public function search($query, $limit = 10, $offset = 0, $lang = null, $cities = null, $domain = null, $fullDomain = null, Array $fields = null)
   {
+    if (is_array($fields))
+    {
+      $fields = implode(',', $fields);
+    }
 
+    $data = [
+      'access_token' => $this->accessToken,
+      'query'        => $query,
+      'limit'        => $limit,
+      'offset'       => $offset,
+      'lang'         => $lang,
+      'cities'       => $cities,
+      'domain'       => $domain,
+      'full_domain'  => $fullDomain,
+      'fields'       => $fields,
+    ];
+    $return = $this->_request('get', '/v3/search', $data);
+    return $this->_checkStatusCode($return)->results;
   }
 
   /**
-   * Returns phrases that are receiving an uncharacteristically high volume of click traffic, and the individual links (hashes) driving traffic to pages containing these phrases.
+   * Returns phrases that are receiving an uncharacteristically high volume of
+   * click traffic, and the individual links (hashes) driving traffic to pages
+   * containing these phrases.
    *
    * @return \stdClass
    * @throws \Exception
@@ -115,7 +147,9 @@ class Bitly
   }
 
   /**
-   * Returns phrases that are receiving a consistently high volume of click traffic, and the individual links (hashes) driving traffic to pages containing these phrases.
+   * Returns phrases that are receiving a consistently high volume of click
+   * traffic, and the individual links (hashes) driving traffic to pages
+   * containing these phrases.
    *
    * @return \stdClass
    * @throws \Exception
@@ -147,7 +181,7 @@ class Bitly
     return $this->_checkStatusCode($return);
   }
 
-  public function linkInfo()
+  public function linkInfo($link)
   {
 
   }
