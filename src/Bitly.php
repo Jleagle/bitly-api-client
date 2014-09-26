@@ -87,17 +87,30 @@ class Bitly
 
   public function realtimeBurstingPhrases()
   {
-
+    $data = [
+      'access_token' => $this->accessToken,
+    ];
+    $return = $this->_request('get', '/v3/realtime/bursting_phrases', $data);
+    return $this->checkStatusCode($return);
   }
 
   public function realtimeHotPhrases()
   {
-
+    $data = [
+      'access_token' => $this->accessToken,
+    ];
+    $return = $this->_request('get', '/v3/realtime/hot_phrases', $data);
+    return $this->checkStatusCode($return);
   }
 
-  public function realtimeClickrate()
+  public function realtimeClickrate($phrase)
   {
-
+    $data = [
+      'access_token' => $this->accessToken,
+      'phrase' => $phrase,
+    ];
+    $return = $this->_request('get', '/v3/realtime/clickrate', $data);
+    return $this->checkStatusCode($return);
   }
 
   public function linkInfo()
