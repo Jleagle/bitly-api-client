@@ -13,6 +13,11 @@ class Bitly
   {
   }
 
+  /**
+   * @param string $accessToken
+   *
+   * @return Bitly
+   */
   public static function accessToken($accessToken)
   {
     $instance = new self();
@@ -20,46 +25,55 @@ class Bitly
     return $instance;
   }
 
+  /**
+   * @param string $username
+   * @param string $password
+   *
+   * @return Bitly
+   * @throws \Exception
+   */
   public static function usernamePassword($username, $password)
   {
     $instance = new self();
-    $instance->oauthAccessToken($username, $password);
+    $instance->_getAccessTokenUsernamePassword($username, $password);
     return $instance;
   }
 
-  public static function redirect()
+  /**
+   * @param string $clientId
+   * @param string $clientSecret
+   * @param string $redirectUrl
+   * @param string $state
+   *
+   * @return Bitly
+   * @throws \Exception
+   */
+  public static function authorize($clientId, $clientSecret, $redirectUrl, $state = null)
   {
-
+    if (isset($_GET['code']) && $_GET['code'])
+    {
+      $instance = new self();
+      $instance->_getAccessTokenCode($clientId, $clientSecret, $_GET['code'], $redirectUrl);
+      return $instance;
+    }
+    else
+    {
+      $data = [
+        'client_id'    => $clientId,
+        'redirect_uri' => $redirectUrl,
+        'state'        => $state,
+      ];
+      header('Location: https://bitly.com/oauth/authorize?'.http_build_query($data));
+      exit;
+    }
   }
 
-  public static function authCode()
-  {
-
-  }
-
+  /**
+   * @return Bitly
+   */
   public static function noAuth()
   {
-
-  }
-
-  public function oauthAccessToken($username, $password)
-  {
-
-    if ($this->accessToken)
-    {
-      return $this->accessToken;
-    }
-
-    $response = $this->_request('post', '/oauth/access_token', null, [$username, $password]);
-    if ($this->isJson($response))
-    {
-      $response = \GuzzleHttp\json_decode($response);
-      throw new \Exception($response->status_code.': '.$response->status_txt);
-    }
-
-    $this->accessToken = $response;
-    return $response;
-
+    return new self();
   }
 
   /**
@@ -77,7 +91,7 @@ class Bitly
       'limit' => $limit,
     ];
     $return = $this->_request('get', '/v3/highvalue', $data);
-    return $this->checkStatusCode($return);
+    return $this->_checkStatusCode($return);
   }
 
   public function search()
@@ -85,24 +99,44 @@ class Bitly
 
   }
 
+  /**
+   * Returns phrases that are receiving an uncharacteristically high volume of click traffic, and the individual links (hashes) driving traffic to pages containing these phrases.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
   public function realtimeBurstingPhrases()
   {
     $data = [
       'access_token' => $this->accessToken,
     ];
     $return = $this->_request('get', '/v3/realtime/bursting_phrases', $data);
-    return $this->checkStatusCode($return);
+    return $this->_checkStatusCode($return);
   }
 
+  /**
+   * Returns phrases that are receiving a consistently high volume of click traffic, and the individual links (hashes) driving traffic to pages containing these phrases.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
   public function realtimeHotPhrases()
   {
     $data = [
       'access_token' => $this->accessToken,
     ];
     $return = $this->_request('get', '/v3/realtime/hot_phrases', $data);
-    return $this->checkStatusCode($return);
+    return $this->_checkStatusCode($return);
   }
 
+  /**
+   * Returns the click rate for content containing a specified phrase.
+   *
+   * @param string $phrase - the phrase for which you'd like to get the click rate.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
   public function realtimeClickrate($phrase)
   {
     $data = [
@@ -110,7 +144,7 @@ class Bitly
       'phrase' => $phrase,
     ];
     $return = $this->_request('get', '/v3/realtime/clickrate', $data);
-    return $this->checkStatusCode($return);
+    return $this->_checkStatusCode($return);
   }
 
   public function linkInfo()
@@ -468,6 +502,39 @@ class Bitly
 
   }
 
+  private function _getAccessTokenUsernamePassword($username, $password)
+  {
+    $response = $this->_request('post', '/oauth/access_token', null, [$username, $password]);
+    if ($this->_isJson($response))
+    {
+      $response = \GuzzleHttp\json_decode($response);
+      throw new \Exception($response->status_code.': '.$response->status_txt);
+    }
+
+    $this->accessToken = $response;
+  }
+
+  private function _getAccessTokenCode($clientId, $clientSecret, $code, $redirectUrl)
+  {
+    $data = [
+      'client_id'     => $clientId,
+      'client_secret' => $clientSecret,
+      'code'          => $code,
+      'redirect_uri'  => $redirectUrl
+    ];
+    $response = $this->_request('post', '/oauth/access_token', $data);
+
+    if ($this->_isJson($response))
+    {
+      // todo - Is this IF needed?
+      $response = \GuzzleHttp\json_decode($response);
+      throw new \Exception($response->status_code.': '.$response->status_txt);
+    }
+
+    parse_str($response, $output);
+    $this->accessToken = $output['access_token'];
+  }
+
   private function _request($type = 'get', $path = '', $data = [], $auth = [])
   {
     $client = new Guzzle();
@@ -484,7 +551,7 @@ class Bitly
     {
       $postData = [
         'query' => $data,
-        'auth' => $auth,
+        'auth'  => $auth,
       ];
       $postData['body']['format'] = 'json';
       $response = $client->post($this->api.$path, $postData);
@@ -498,7 +565,7 @@ class Bitly
     return (string)$response->getBody();
   }
 
-  private function isJson($string)
+  private function _isJson($string)
   {
     try
     {
@@ -511,7 +578,7 @@ class Bitly
     }
   }
 
-  private function checkStatusCode($data)
+  private function _checkStatusCode($data)
   {
     $data = \GuzzleHttp\json_decode($data);
     if ($data->status_code == 200)
