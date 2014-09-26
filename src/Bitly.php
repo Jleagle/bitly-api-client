@@ -175,40 +175,122 @@ class Bitly
   {
     $data = [
       'access_token' => $this->accessToken,
-      'phrase' => $phrase,
+      'phrase'       => $phrase,
     ];
+
     $return = $this->_request('get', '/v3/realtime/clickrate', $data);
+
     return $this->_checkStatusCode($return);
   }
 
+  /**
+   * @param string $link - a Bitlink.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
   public function linkInfo($link)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link,
+    ];
 
+    $return = $this->_request('get', '/v3/link/info', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkContent()
+  /**
+   * @param string $link - a Bitlink.
+   * @param string $contentType - specifies whether to return the content as html or plain text (default: html).
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkContent($link, $contentType = 'html')
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link,
+      'content_type' => $contentType
+    ];
 
+    $return = $this->_request('get', '/v3/link/content', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkCategory()
+  /**
+   * @param string $link - a Bitlink.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkCategory($link)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link
+    ];
 
+    $return = $this->_request('get', '/v3/link/category', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkSocial()
+  /**
+   * @param string $link - a Bitlink.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkSocial($link)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link
+    ];
 
+    $return = $this->_request('get', '/v3/link/social', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkLocation()
+  /**
+   * @param string $link - a Bitlink.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkLocation($link)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link
+    ];
 
+    $return = $this->_request('get', '/v3/link/location', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkLanguage()
+  /**
+   * @param string $link - a Bitlink.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkLanguage($link)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link
+    ];
 
+    $return = $this->_request('get', '/v3/link/language', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
   public function expand()
