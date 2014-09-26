@@ -39,7 +39,7 @@ class Bitly
 
   public static function noAuth()
   {
-    
+
   }
 
   public function oauthAccessToken($username, $password)
@@ -50,7 +50,7 @@ class Bitly
       return $this->accessToken;
     }
 
-    $response = $this->_request('post', '/oauth/access_token', ['auth' =>  [$username, $password]]);
+    $response = $this->_request('post', '/oauth/access_token', null, [$username, $password]);
     if ($this->isJson($response))
     {
       $response = \GuzzleHttp\json_decode($response);
@@ -62,13 +62,19 @@ class Bitly
 
   }
 
+  /**
+   * Returns a specified number of "high-value" Bitlinks that are popular across bitly at this particular moment.
+   *
+   * @param int $limit - The maximum number of high-value links to return.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
   public function highValue($limit = 10)
   {
     $data = [
-      'query' => [
-        'access_token' => $this->accessToken,
-        'limit' => $limit
-      ]
+      'access_token' => $this->accessToken,
+      'limit' => $limit,
     ];
     $return = $this->_request('get', '/v3/highvalue', $data);
     return $this->checkStatusCode($return);
@@ -449,19 +455,26 @@ class Bitly
 
   }
 
-  private function _request($type = 'get', $path = '', $data = [])
+  private function _request($type = 'get', $path = '', $data = [], $auth = [])
   {
     $client = new Guzzle();
 
     if ($type == 'get')
     {
-      $data['query']['format'] = 'json';
-      $response = $client->get($this->api . $path, $data);
+      $getData = [
+        'query' => $data,
+      ];
+      $getData['query']['format'] = 'json';
+      $response = $client->get($this->api.$path, $getData);
     }
     else
     {
-      $data['body']['format'] = 'json';
-      $response = $client->post($this->api . $path, $data);
+      $postData = [
+        'query' => $data,
+        'auth' => $auth,
+      ];
+      $postData['body']['format'] = 'json';
+      $response = $client->post($this->api.$path, $postData);
     }
 
     if ($response->getStatusCode() != 200)
