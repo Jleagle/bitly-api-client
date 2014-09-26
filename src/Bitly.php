@@ -293,24 +293,84 @@ class Bitly
     return $this->_checkStatusCode($return);
   }
 
-  public function expand()
+  /**
+   * @param string $hash
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function expand($hash)
   {
+    $hash = $this->_getHashFromUrl($hash);
 
+    $data = [
+      'access_token' => $this->accessToken,
+      'hash'         => $hash
+    ];
+
+    $return = $this->_request('get', '/v3/expand', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function info()
+  /**
+   * @param string $hash
+   * @param bool   $expandUser
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function info($hash, $expandUser = false)
   {
+    $hash = $this->_getHashFromUrl($hash);
 
+    $data = [
+      'access_token' => $this->accessToken,
+      'hash'         => $hash,
+      'expand_user'  => $expandUser?'true':'false',
+    ];
+
+    $return = $this->_request('get', '/v3/info', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkLookup()
+  /**
+   * @param string $url
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkLookup($url)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'url'          => $url,
+    ];
 
+    $return = $this->_request('get', '/v3/link/lookup', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function shorten()
+  /**
+   * @param string $longUrl
+   * @param string $domain  - Ue the ShortenDomainEnum class.
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function shorten($longUrl, $domain = null)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'longUrl'      => $longUrl,
+      'domain'       => $domain
+    ];
 
+    $return = $this->_request('get', '/v3/shorten', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
   public function userLinkEdit()
@@ -703,6 +763,13 @@ class Bitly
     }
 
     throw new \Exception($data->status_txt);
+  }
+
+  private function _getHashFromUrl($url)
+  {
+    $hash = explode('/', $url);
+
+    return end($hash);
   }
 
 }

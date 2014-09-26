@@ -23,6 +23,5 @@
     "php":               ">=5.4.0",
     "packaged/helpers":  "dev-master",
     "guzzlehttp/guzzle": "~4.0"
-  },
-  "require-dev": {}
+  }
 }
