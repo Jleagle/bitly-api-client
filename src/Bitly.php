@@ -96,6 +96,8 @@ class Bitly
   }
 
   /**
+   * Search links receiving clicks across bitly by content, language, location, and more.
+   *
    * @param string   $query      - string to query for.
    * @param int      $limit      - the maximum number of links to return.
    * @param int      $offset     - which result to start with (defaults to 0).
@@ -166,7 +168,7 @@ class Bitly
   /**
    * Returns the click rate for content containing a specified phrase.
    *
-   * @param string $phrase - the phrase for which you'd like to get the click rate.
+   * @param string $phrase
    *
    * @return \stdClass
    * @throws \Exception
@@ -184,7 +186,9 @@ class Bitly
   }
 
   /**
-   * @param string $link - a Bitlink.
+   * Returns metadata about a single Bitlink.
+   *
+   * @param string $link
    *
    * @return \stdClass
    * @throws \Exception
@@ -202,8 +206,11 @@ class Bitly
   }
 
   /**
-   * @param string $link - a Bitlink.
-   * @param string $contentType - specifies whether to return the content as html or plain text (default: html).
+   * Returns the “main article” from the linked page, as determined by the
+   * content extractor, in either HTML or plain text format.
+   *
+   * @param string $link
+   * @param string $contentType
    *
    * @return \stdClass
    * @throws \Exception
@@ -222,7 +229,10 @@ class Bitly
   }
 
   /**
-   * @param string $link - a Bitlink.
+   * Returns the detected categories for a document, in descending order of
+   * confidence.
+   *
+   * @param string $link
    *
    * @return \stdClass
    * @throws \Exception
@@ -240,7 +250,12 @@ class Bitly
   }
 
   /**
-   * @param string $link - a Bitlink.
+   * Returns the "social score" for a specified Bitlink. Note that the social
+   * score are highly dependent upon activity (clicks) occurring on the Bitlink.
+   * If there have not been clicks on a Bitlink within the last 24 hours, it is
+   * possible a social score for that link does not exist.
+   *
+   * @param string $link
    *
    * @return \stdClass
    * @throws \Exception
@@ -258,7 +273,13 @@ class Bitly
   }
 
   /**
-   * @param string $link - a Bitlink.
+   * Returns the significant locations for the Bitlink or None if locations do
+   * not exist. Note that locations are highly dependent upon activity (clicks)
+   * occurring on the Bitlink. If there have not been clicks on a Bitlink within
+   * the last 24 hours, it is possible that location data for that link does not
+   * exist.
+   *
+   * @param string $link
    *
    * @return \stdClass
    * @throws \Exception
@@ -276,7 +297,12 @@ class Bitly
   }
 
   /**
-   * @param string $link - a Bitlink.
+   * Returns the significant languages for the Bitlink. Note that languages are
+   * highly dependent upon activity (clicks) occurring on the Bitlink. If there
+   * have not been clicks on a Bitlink within the last 24 hours, it is possible
+   * that language data for that link does not exist.
+   *
+   * @param string $link
    *
    * @return \stdClass
    * @throws \Exception
@@ -294,6 +320,8 @@ class Bitly
   }
 
   /**
+   * Given a bitly URL or hash (or multiple), returns the target (long) URL.
+   *
    * @param string $hash
    *
    * @return \stdClass
@@ -314,20 +342,22 @@ class Bitly
   }
 
   /**
+   * This is used to return the page title for a given Bitlink.
+   *
    * @param string $hash
    * @param bool   $expandUser
    *
    * @return \stdClass
    * @throws \Exception
    */
-  public function info($hash, $expandUser = false)
+  public function info($hash, $expandUser = null)
   {
     $hash = $this->_getHashFromUrl($hash);
 
     $data = [
       'access_token' => $this->accessToken,
       'hash'         => $hash,
-      'expand_user'  => $expandUser?'true':'false',
+      'expand_user'  => $expandUser ? 'true' : 'false',
     ];
 
     $return = $this->_request('get', '/v3/info', $data);
@@ -336,6 +366,8 @@ class Bitly
   }
 
   /**
+   * This is used to query for a Bitlink based on a long URL.
+   *
    * @param string $url
    *
    * @return \stdClass
@@ -354,8 +386,10 @@ class Bitly
   }
 
   /**
+   * Given a long URL, returns a bitly short URL.
+   *
    * @param string $longUrl
-   * @param string $domain  - Ue the ShortenDomainEnum class.
+   * @param string $domain  - A value from the ShortenDomainEnum enum
    *
    * @return \stdClass
    * @throws \Exception
@@ -373,24 +407,100 @@ class Bitly
     return $this->_checkStatusCode($return);
   }
 
-  public function userLinkEdit()
+  /**
+   * @param string $link
+   * @param array  $fields - An array with UserLinkEditEnum values as keys
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function userLinkEdit($link, array $fields)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link,
+      'edit'         => implode(',', array_keys($fields))
+    ];
 
+    $data = array_merge($data, $fields);
+    $return = $this->_request('get', '/v3/user/link_edit', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function userLinkLookup()
+  /**
+   * This is used to query for a Bitlink shortened by the authenticated user
+   * based on a long URL.
+   *
+   * @param string $url
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function userLinkLookup($url)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'url'          => $url,
+    ];
 
+    $return = $this->_request('get', '/v3/user/link_lookup', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function userLinkSave()
+  /**
+   * Saves a long URL as a Bitlink in a user's history, with optional pre-set
+   * metadata. (Also returns a short URL for that link.)
+   *
+   * @param string $url
+   * @param string $title
+   * @param string $note
+   * @param bool   $private
+   * @param int    $userTimestamp
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function userLinkSave($url, $title = null, $note = null, $private = null, $userTimestamp = null)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'url'          => $url,
+      'title'        => $title,
+      'note'         => $note,
+      'private'      => $private ? 'true' : 'false',
+      'user_ts'      => $userTimestamp,
+    ];
 
+    $return = $this->_request('get', '/v3/user/link_save', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function userSaveCustomDomainKeyword()
+  /**
+   * Save a Custom Bitlink for a custom short domain.
+   *
+   * @param string $keywordLink
+   * @param string $targetLink
+   * @param bool   $overwrite
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function userSaveCustomDomainKeyword($keywordLink, $targetLink, $overwrite = null)
   {
+    // todo - make nice error codes, check docs
+    $data = [
+      'access_token' => $this->accessToken,
+      'keyword_link' => $keywordLink,
+      'target_link'  => $targetLink,
+      'overwrite'    => $overwrite ? 'true' : 'false',
+    ];
 
+    $return = $this->_request('get', '/v3/user/save_custom_domain_keyword', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
   public function linkClicks()

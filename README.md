@@ -1,7 +1,7 @@
 Bitly API Client
 ============
 
-###To use the class, you need to use one of four static methods.
+### To use the class, you need to use one of four static methods.
 
 If you have a bitly account username and password:
 
@@ -26,6 +26,8 @@ If you don't need to interact with any API endpoints that require auth:
 $bitly = \Jleagle\Bitly::noAuth();
 ```
 
-###From there you have access to each endpoint documented at http://dev.bitly.com/data_apis.html
+### From there you have access to each endpoint documented at http://dev.bitly.com/data_apis.html:
 
+Return the click rate for content containing 'obama'
 
+$realtimeClickrates = $bitly->realtimeClickrate('obama');
