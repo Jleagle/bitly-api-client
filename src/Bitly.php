@@ -70,7 +70,7 @@ class Bitly
    * Returns a specified number of "high-value" Bitlinks that are popular
    * across bitly at this particular moment.
    *
-   * @param int $limit - The maximum number of high-value links to return.
+   * @param int $limit
    *
    * @return \stdClass
    * @throws \Exception
@@ -78,7 +78,6 @@ class Bitly
   public function highValue($limit = 10)
   {
     $data = [
-      'access_token' => $this->accessToken,
       'limit' => $limit,
     ];
     $return = $this->_request('get', '/v3/highvalue', $data);
@@ -86,20 +85,21 @@ class Bitly
   }
 
   /**
-   * Search links receiving clicks across bitly by content, language, location, and more.
+   * Search links receiving clicks across bitly by content, language, location,
+   * and more.
    *
-   * @param string   $query      - string to query for.
-   * @param int      $limit      - the maximum number of links to return.
-   * @param int      $offset     - which result to start with (defaults to 0).
-   * @param string   $lang       - favor results in this language (two letter ISO code).
-   * @param string   $cities     - show links active in this city (ordered like country-state-city, e.g. us-il-chicago).
-   * @param string   $domain     - restrict results to this web domain (like bitly.com).
-   * @param string   $fullDomain - restrict results to this full web domain (like blog.bitly.com).
-   * @param string[] $fields     - fields - which fields to return in the response. An array of SearchFieldEnum constants
+   * @param string   $query
+   * @param int      $limit
+   * @param int      $offset
+   * @param string   $lang
+   * @param string   $cities
+   * @param string   $domain
+   * @param string   $fullDomain
+   * @param string[] $fields
    *
    * @return \stdClass[]
    */
-  public function search($query, $limit = 10, $offset = 0, $lang = null, $cities = null, $domain = null, $fullDomain = null, Array $fields = null)
+  public function search($query, $limit = 10, $offset = 0, $lang = null, $cities = null, $domain = null, $fullDomain = null, array $fields = null)
   {
     if (is_array($fields))
     {
@@ -107,15 +107,14 @@ class Bitly
     }
 
     $data = [
-      'access_token' => $this->accessToken,
-      'query'        => $query,
-      'limit'        => $limit,
-      'offset'       => $offset,
-      'lang'         => $lang,
-      'cities'       => $cities,
-      'domain'       => $domain,
-      'full_domain'  => $fullDomain,
-      'fields'       => $fields,
+      'query'       => $query,
+      'limit'       => $limit,
+      'offset'      => $offset,
+      'lang'        => $lang,
+      'cities'      => $cities,
+      'domain'      => $domain,
+      'full_domain' => $fullDomain,
+      'fields'      => $fields,
     ];
     $return = $this->_request('get', '/v3/search', $data);
     return $this->_checkStatusCode($return)->results;
@@ -131,10 +130,7 @@ class Bitly
    */
   public function realtimeBurstingPhrases()
   {
-    $data = [
-      'access_token' => $this->accessToken,
-    ];
-    $return = $this->_request('get', '/v3/realtime/bursting_phrases', $data);
+    $return = $this->_request('get', '/v3/realtime/bursting_phrases');
     return $this->_checkStatusCode($return);
   }
 
@@ -148,10 +144,7 @@ class Bitly
    */
   public function realtimeHotPhrases()
   {
-    $data = [
-      'access_token' => $this->accessToken,
-    ];
-    $return = $this->_request('get', '/v3/realtime/hot_phrases', $data);
+    $return = $this->_request('get', '/v3/realtime/hot_phrases');
     return $this->_checkStatusCode($return);
   }
 
@@ -166,8 +159,7 @@ class Bitly
   public function realtimeClickrate($phrase)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'phrase'       => $phrase,
+      'phrase' => $phrase,
     ];
 
     $return = $this->_request('get', '/v3/realtime/clickrate', $data);
@@ -186,8 +178,7 @@ class Bitly
   public function linkInfo($link)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
+      'link' => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/info', $data);
@@ -208,7 +199,6 @@ class Bitly
   public function linkContent($link, $contentType = 'html')
   {
     $data = [
-      'access_token' => $this->accessToken,
       'link'         => $link,
       'content_type' => $contentType,
     ];
@@ -230,8 +220,7 @@ class Bitly
   public function linkCategory($link)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
+      'link' => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/category', $data);
@@ -253,8 +242,7 @@ class Bitly
   public function linkSocial($link)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
+      'link' => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/social', $data);
@@ -277,8 +265,7 @@ class Bitly
   public function linkLocation($link)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
+      'link' => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/location', $data);
@@ -300,8 +287,7 @@ class Bitly
   public function linkLanguage($link)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
+      'link' => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/language', $data);
@@ -322,8 +308,7 @@ class Bitly
     $hash = $this->_getHashFromUrl($hash);
 
     $data = [
-      'access_token' => $this->accessToken,
-      'hash'         => $hash,
+      'hash' => $hash,
     ];
 
     $return = $this->_request('get', '/v3/expand', $data);
@@ -345,9 +330,8 @@ class Bitly
     $hash = $this->_getHashFromUrl($hash);
 
     $data = [
-      'access_token' => $this->accessToken,
-      'hash'         => $hash,
-      'expand_user'  => $expandUser ? 'true' : 'false',
+      'hash'        => $hash,
+      'expand_user' => $expandUser ? 'true' : 'false',
     ];
 
     $return = $this->_request('get', '/v3/info', $data);
@@ -366,8 +350,7 @@ class Bitly
   public function linkLookup($url)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'url'          => $url,
+      'url' => $url,
     ];
 
     $return = $this->_request('get', '/v3/link/lookup', $data);
@@ -379,7 +362,7 @@ class Bitly
    * Given a long URL, returns a bitly short URL.
    *
    * @param string $longUrl
-   * @param string $domain  - A value from the ShortenDomainEnum enum
+   * @param string $domain - Use the ShortenDomainEnum enum
    *
    * @return \stdClass
    * @throws \Exception
@@ -387,9 +370,8 @@ class Bitly
   public function shorten($longUrl, $domain = null)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'longUrl'      => $longUrl,
-      'domain'       => $domain,
+      'longUrl' => $longUrl,
+      'domain'  => $domain,
     ];
 
     $return = $this->_request('get', '/v3/shorten', $data);
@@ -407,12 +389,11 @@ class Bitly
   public function userLinkEdit($link, array $fields)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
-      'edit'         => implode(',', array_keys($fields)),
+      'link' => $link,
+      'edit' => implode(',', array_keys($fields)),
     ];
 
-    $data = array_merge($data, $fields);
+    $data   = array_merge($data, $fields);
     $return = $this->_request('get', '/v3/user/link_edit', $data);
 
     return $this->_checkStatusCode($return);
@@ -430,8 +411,7 @@ class Bitly
   public function userLinkLookup($url)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'url'          => $url,
+      'url' => $url,
     ];
 
     $return = $this->_request('get', '/v3/user/link_lookup', $data);
@@ -455,12 +435,11 @@ class Bitly
   public function userLinkSave($url, $title = null, $note = null, $private = null, $userTimestamp = null)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'url'          => $url,
-      'title'        => $title,
-      'note'         => $note,
-      'private'      => $private ? 'true' : 'false',
-      'user_ts'      => $userTimestamp,
+      'url'     => $url,
+      'title'   => $title,
+      'note'    => $note,
+      'private' => $private ? 'true' : 'false',
+      'user_ts' => $userTimestamp,
     ];
 
     $return = $this->_request('get', '/v3/user/link_save', $data);
@@ -482,7 +461,6 @@ class Bitly
   {
     // todo - make nice error codes, check docs
     $data = [
-      'access_token' => $this->accessToken,
       'keyword_link' => $keywordLink,
       'target_link'  => $targetLink,
       'overwrite'    => $overwrite ? 'true' : 'false',
@@ -501,7 +479,7 @@ class Bitly
    * Returns the number of clicks on a single Bitlink.
    *
    * @param string $link
-   * @param string $unit - Use the TimeUnitEnum enum
+   * @param string $unit     - Use the TimeUnitEnum enum
    * @param int    $units
    * @param string $timezone - Use the TimezoneEnum enum
    * @param bool   $rollup
@@ -513,13 +491,12 @@ class Bitly
   public function linkClicks($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $rollup = false, $limit = 100)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
-      'unit'         => $unit,
-      'units'        => $units,
-      'timezone'     => $timezone,
-      'rollup'       => $rollup ? 'true' : 'false',
-      'limit'        => $limit,
+      'link'     => $link,
+      'unit'     => $unit,
+      'units'    => $units,
+      'timezone' => $timezone,
+      'rollup'   => $rollup ? 'true' : 'false',
+      'limit'    => $limit,
     ];
 
     $return = $this->_request('get', '/v3/link/clicks', $data);
@@ -544,7 +521,6 @@ class Bitly
   public function linkCountries($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
   {
     $data = [
-      'access_token'      => $this->accessToken,
       'link'              => $link,
       'unit'              => $unit,
       'units'             => $units,
@@ -574,12 +550,11 @@ class Bitly
   public function linkEncoders($link, $myNetwork = false, $subAccounts = false, $limit = 10, $expandUser = false)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
-      'my_network'   => $myNetwork ? 'true' : 'false',
-      'subaccounts'  => $subAccounts ? 'true' : 'false',
-      'limit'        => $limit,
-      'expand_user'  => $expandUser ? 'true' : 'false',
+      'link'        => $link,
+      'my_network'  => $myNetwork ? 'true' : 'false',
+      'subaccounts' => $subAccounts ? 'true' : 'false',
+      'limit'       => $limit,
+      'expand_user' => $expandUser ? 'true' : 'false',
     ];
 
     $return = $this->_request('get', '/v3/link/encoders', $data);
@@ -604,12 +579,11 @@ class Bitly
   public function linkEncodersByCount($link, $myNetwork = false, $subAccounts = false, $limit = 10, $expandUser = false)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
-      'my_network'   => $myNetwork ? 'true' : 'false',
-      'subaccounts'  => $subAccounts ? 'true' : 'false',
-      'limit'        => $limit,
-      'expand_user'  => $expandUser ? 'true' : 'false',
+      'link'        => $link,
+      'my_network'  => $myNetwork ? 'true' : 'false',
+      'subaccounts' => $subAccounts ? 'true' : 'false',
+      'limit'       => $limit,
+      'expand_user' => $expandUser ? 'true' : 'false',
     ];
 
     $return = $this->_request('get', '/v3/link/encoders_by_count', $data);
@@ -628,8 +602,7 @@ class Bitly
   public function linkEncodersCount($link)
   {
     $data = [
-      'access_token' => $this->accessToken,
-      'link'         => $link,
+      'link' => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/encoders_count', $data);
@@ -654,7 +627,6 @@ class Bitly
   public function linkReferrers($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
   {
     $data = [
-      'access_token'      => $this->accessToken,
       'link'              => $link,
       'unit'              => $unit,
       'units'             => $units,
@@ -685,7 +657,6 @@ class Bitly
   public function linkReferrersByDomain($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
   {
     $data = [
-      'access_token'      => $this->accessToken,
       'link'              => $link,
       'unit'              => $unit,
       'units'             => $units,
@@ -716,7 +687,6 @@ class Bitly
   public function linkReferringDomains($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
   {
     $data = [
-      'access_token'      => $this->accessToken,
       'link'              => $link,
       'unit'              => $unit,
       'units'             => $units,
@@ -747,7 +717,6 @@ class Bitly
   public function linkShares($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $rollup = false, $limit = 100, $unitReferenceTs = null)
   {
     $data = [
-      'access_token'      => $this->accessToken,
       'link'              => $link,
       'unit'              => $unit,
       'units'             => $units,
@@ -1005,7 +974,7 @@ class Bitly
    */
   private function _getAccessTokenUsernamePassword($username, $password)
   {
-    $response = $this->_request('post', '/oauth/access_token', null, [$username, $password]);
+    $response = $this->_request('post', '/oauth/access_token', null, [$username, $password], false);
     if ($this->_isJson($response))
     {
       $response = \GuzzleHttp\json_decode($response);
@@ -1031,7 +1000,7 @@ class Bitly
       'code'          => $code,
       'redirect_uri'  => $redirectUrl
     ];
-    $response = $this->_request('post', '/oauth/access_token', $data);
+    $response = $this->_request('post', '/oauth/access_token', $data, [], false);
 
     if ($this->_isJson($response))
     {
@@ -1049,13 +1018,21 @@ class Bitly
    * @param string $path
    * @param array  $data
    * @param array  $auth
+   * @param bool   $accessToken
    *
    * @return string
    * @throws \Exception
    */
-  private function _request($type = 'get', $path = '', $data = [], $auth = [])
+  private function _request($type = 'get', $path = '', $data = [], $auth = [], $accessToken = true)
   {
     $client = new Guzzle();
+
+    $data = array_filter($data);
+
+    if ($accessToken)
+    {
+      $data['access_token'] = $this->accessToken;
+    }
 
     if ($type == 'get')
     {
