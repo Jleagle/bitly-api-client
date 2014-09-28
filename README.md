@@ -20,14 +20,10 @@ If you want to redirect the user to auth with Bitly:
 $bitly = \Jleagle\Bitly::authorize($clientId, $clientSecret, $projectUrl, $state);
 ```
 
-If you don't need to interact with any API endpoints that require auth:
-
-```php
-$bitly = \Jleagle\Bitly::noAuth();
-```
-
 ### From there you have access to each endpoint documented at http://dev.bitly.com/data_apis.html:
 
 Return the click rate for content containing 'obama'
 
+```php
 $realtimeClickrates = $bitly->realtimeClickrate('obama');
+```

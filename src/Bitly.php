@@ -2,16 +2,14 @@
 namespace Jleagle;
 
 use GuzzleHttp\Client as Guzzle;
+use Jleagle\Enums\TimeUnitEnum;
+use Jleagle\Enums\TimezoneEnum;
 
 class Bitly
 {
 
   private $api = 'https://api-ssl.bitly.com';
   private $accessToken;
-
-  public function __construct()
-  {
-  }
 
   /**
    * @param string $accessToken
@@ -66,14 +64,6 @@ class Bitly
       header('Location: https://bitly.com/oauth/authorize?'.http_build_query($data));
       exit;
     }
-  }
-
-  /**
-   * @return Bitly
-   */
-  public static function noAuth()
-  {
-    return new self();
   }
 
   /**
@@ -220,7 +210,7 @@ class Bitly
     $data = [
       'access_token' => $this->accessToken,
       'link'         => $link,
-      'content_type' => $contentType
+      'content_type' => $contentType,
     ];
 
     $return = $this->_request('get', '/v3/link/content', $data);
@@ -241,7 +231,7 @@ class Bitly
   {
     $data = [
       'access_token' => $this->accessToken,
-      'link'         => $link
+      'link'         => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/category', $data);
@@ -264,7 +254,7 @@ class Bitly
   {
     $data = [
       'access_token' => $this->accessToken,
-      'link'         => $link
+      'link'         => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/social', $data);
@@ -288,7 +278,7 @@ class Bitly
   {
     $data = [
       'access_token' => $this->accessToken,
-      'link'         => $link
+      'link'         => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/location', $data);
@@ -311,7 +301,7 @@ class Bitly
   {
     $data = [
       'access_token' => $this->accessToken,
-      'link'         => $link
+      'link'         => $link,
     ];
 
     $return = $this->_request('get', '/v3/link/language', $data);
@@ -333,7 +323,7 @@ class Bitly
 
     $data = [
       'access_token' => $this->accessToken,
-      'hash'         => $hash
+      'hash'         => $hash,
     ];
 
     $return = $this->_request('get', '/v3/expand', $data);
@@ -399,7 +389,7 @@ class Bitly
     $data = [
       'access_token' => $this->accessToken,
       'longUrl'      => $longUrl,
-      'domain'       => $domain
+      'domain'       => $domain,
     ];
 
     $return = $this->_request('get', '/v3/shorten', $data);
@@ -419,7 +409,7 @@ class Bitly
     $data = [
       'access_token' => $this->accessToken,
       'link'         => $link,
-      'edit'         => implode(',', array_keys($fields))
+      'edit'         => implode(',', array_keys($fields)),
     ];
 
     $data = array_merge($data, $fields);
@@ -488,7 +478,7 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function userSaveCustomDomainKeyword($keywordLink, $targetLink, $overwrite = null)
+  public function userSaveCustomDomainKeyword($keywordLink, $targetLink, $overwrite = false)
   {
     // todo - make nice error codes, check docs
     $data = [
@@ -498,54 +488,278 @@ class Bitly
       'overwrite'    => $overwrite ? 'true' : 'false',
     ];
 
-    $return = $this->_request('get', '/v3/user/save_custom_domain_keyword', $data);
+    $return = $this->_request(
+      'get',
+      '/v3/user/save_custom_domain_keyword',
+      $data
+    );
 
     return $this->_checkStatusCode($return);
   }
 
-  public function linkClicks()
+  /**
+   * Returns the number of clicks on a single Bitlink.
+   *
+   * @param string $link
+   * @param string $unit - Use the TimeUnitEnum enum
+   * @param int    $units
+   * @param string $timezone - Use the TimezoneEnum enum
+   * @param bool   $rollup
+   * @param int    $limit
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkClicks($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $rollup = false, $limit = 100)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link,
+      'unit'         => $unit,
+      'units'        => $units,
+      'timezone'     => $timezone,
+      'rollup'       => $rollup ? 'true' : 'false',
+      'limit'        => $limit,
+    ];
 
+    $return = $this->_request('get', '/v3/link/clicks', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkCountries()
+  /**
+   * Returns metrics about the countries referring click traffic to a single
+   * Bitlink.
+   *
+   * @param string $link
+   * @param string $unit     - Use the TimeUnitEnum enum
+   * @param int    $units
+   * @param string $timezone - Use the TimezoneEnum enum
+   * @param int    $limit
+   * @param int    $unitReferenceTs
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkCountries($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
   {
+    $data = [
+      'access_token'      => $this->accessToken,
+      'link'              => $link,
+      'unit'              => $unit,
+      'units'             => $units,
+      'timezone'          => $timezone,
+      'limit'             => $limit,
+      'unit_reference_ts' => $unitReferenceTs,
+    ];
 
+    $return = $this->_request('get', '/v3/link/countries', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkEncoders()
+  /**
+   * Returns users who have encoded this long URL (optionally only those in the
+   * requesting user's social graph).
+   *
+   * @param string $link
+   * @param bool   $myNetwork
+   * @param bool   $subAccounts
+   * @param int    $limit
+   * @param bool   $expandUser
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkEncoders($link, $myNetwork = false, $subAccounts = false, $limit = 10, $expandUser = false)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link,
+      'my_network'   => $myNetwork ? 'true' : 'false',
+      'subaccounts'  => $subAccounts ? 'true' : 'false',
+      'limit'        => $limit,
+      'expand_user'  => $expandUser ? 'true' : 'false',
+    ];
 
+    $return = $this->_request('get', '/v3/link/encoders', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkEncodersByCount()
+  /**
+   * Returns users who have encoded this link (optionally only those in the
+   * requesting user's social graph), sorted by the number of clicks on each
+   * encoding user's link.
+   *
+   * @param string $link
+   * @param bool   $myNetwork
+   * @param bool   $subAccounts
+   * @param int    $limit
+   * @param bool   $expandUser
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkEncodersByCount($link, $myNetwork = false, $subAccounts = false, $limit = 10, $expandUser = false)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link,
+      'my_network'   => $myNetwork ? 'true' : 'false',
+      'subaccounts'  => $subAccounts ? 'true' : 'false',
+      'limit'        => $limit,
+      'expand_user'  => $expandUser ? 'true' : 'false',
+    ];
 
+    $return = $this->_request('get', '/v3/link/encoders_by_count', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkEncodersCount()
+  /**
+   * Returns the number of users who have shortened (encoded) a single Bitlink.
+   *
+   * @param string $link
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkEncodersCount($link)
   {
+    $data = [
+      'access_token' => $this->accessToken,
+      'link'         => $link,
+    ];
 
+    $return = $this->_request('get', '/v3/link/encoders_count', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkReferrers()
+  /**
+   * Returns metrics about the pages referring click traffic to a single
+   * Bitlink.
+   *
+   * @param string $link
+   * @param string $unit     - Use the TimeUnitEnum enum
+   * @param int    $units
+   * @param string $timezone - Use the TimezoneEnum enum
+   * @param int    $limit
+   * @param int    $unitReferenceTs
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkReferrers($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
   {
+    $data = [
+      'access_token'      => $this->accessToken,
+      'link'              => $link,
+      'unit'              => $unit,
+      'units'             => $units,
+      'timezone'          => $timezone,
+      'limit'             => $limit,
+      'unit_reference_ts' => $unitReferenceTs,
+    ];
 
+    $return = $this->_request('get', '/v3/link/referrers', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkReferrersByDomain()
+  /**
+   * Returns metrics about the pages referring click traffic to a single
+   * Bitlink, grouped by referring domain.
+   *
+   * @param string $link
+   * @param string $unit     - Use the TimeUnitEnum enum
+   * @param int    $units
+   * @param string $timezone - Use the TimezoneEnum enum
+   * @param int    $limit
+   * @param int    $unitReferenceTs
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkReferrersByDomain($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
   {
+    $data = [
+      'access_token'      => $this->accessToken,
+      'link'              => $link,
+      'unit'              => $unit,
+      'units'             => $units,
+      'timezone'          => $timezone,
+      'limit'             => $limit,
+      'unit_reference_ts' => $unitReferenceTs,
+    ];
 
+    $return = $this->_request('get', '/v3/link/referrers_by_domain', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkReferringDomains()
+  /**
+   * Returns metrics about the domains referring click traffic to a single
+   * Bitlink.
+   *
+   * @param string $link
+   * @param string $unit     - Use the TimeUnitEnum enum
+   * @param int    $units
+   * @param string $timezone - Use the TimezoneEnum enum
+   * @param int    $limit
+   * @param int    $unitReferenceTs
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkReferringDomains($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
   {
+    $data = [
+      'access_token'      => $this->accessToken,
+      'link'              => $link,
+      'unit'              => $unit,
+      'units'             => $units,
+      'timezone'          => $timezone,
+      'limit'             => $limit,
+      'unit_reference_ts' => $unitReferenceTs,
+    ];
 
+    $return = $this->_request('get', '/v3/link/referring_domains', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
-  public function linkShares()
+  /**
+   * Returns metrics about a shares of a single link.
+   *
+   * @param string $link
+   * @param string $unit     - Use the TimeUnitEnum enum
+   * @param int    $units
+   * @param string $timezone - Use the TimezoneEnum enum
+   * @param bool   $rollup
+   * @param int    $limit
+   * @param int    $unitReferenceTs
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
+  public function linkShares($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $rollup = false, $limit = 100, $unitReferenceTs = null)
   {
+    $data = [
+      'access_token'      => $this->accessToken,
+      'link'              => $link,
+      'unit'              => $unit,
+      'units'             => $units,
+      'timezone'          => $timezone,
+      'rollup'            => $rollup ? 'true' : 'false',
+      'limit'             => $limit,
+      'unit_reference_ts' => $unitReferenceTs,
+    ];
 
+    $return = $this->_request('get', '/v3/link/shares', $data);
+
+    return $this->_checkStatusCode($return);
   }
 
   public function oauthApp()
@@ -778,16 +992,17 @@ class Bitly
 
   }
 
-  public function nsqLookup()
-  {
-
-  }
-
   public function nsqStats()
   {
 
   }
 
+  /**
+   * @param string $username
+   * @param string $password
+   *
+   * @throws \Exception
+   */
   private function _getAccessTokenUsernamePassword($username, $password)
   {
     $response = $this->_request('post', '/oauth/access_token', null, [$username, $password]);
@@ -800,6 +1015,14 @@ class Bitly
     $this->accessToken = $response;
   }
 
+  /**
+   * @param string $clientId
+   * @param string $clientSecret
+   * @param string $code
+   * @param string $redirectUrl
+   *
+   * @throws \Exception
+   */
   private function _getAccessTokenCode($clientId, $clientSecret, $code, $redirectUrl)
   {
     $data = [
@@ -821,6 +1044,15 @@ class Bitly
     $this->accessToken = $output['access_token'];
   }
 
+  /**
+   * @param string $type
+   * @param string $path
+   * @param array  $data
+   * @param array  $auth
+   *
+   * @return string
+   * @throws \Exception
+   */
   private function _request($type = 'get', $path = '', $data = [], $auth = [])
   {
     $client = new Guzzle();
@@ -851,6 +1083,11 @@ class Bitly
     return (string)$response->getBody();
   }
 
+  /**
+   * @param string $string
+   *
+   * @return bool
+   */
   private function _isJson($string)
   {
     try
@@ -864,6 +1101,12 @@ class Bitly
     }
   }
 
+  /**
+   * @param array $data
+   *
+   * @return \stdClass
+   * @throws \Exception
+   */
   private function _checkStatusCode($data)
   {
     $data = \GuzzleHttp\json_decode($data);
@@ -875,6 +1118,11 @@ class Bitly
     throw new \Exception($data->status_txt);
   }
 
+  /**
+   * @param string $url
+   *
+   * @return mixed
+   */
   private function _getHashFromUrl($url)
   {
     $hash = explode('/', $url);
