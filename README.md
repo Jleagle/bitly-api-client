@@ -1,5 +1,10 @@
 Bitly API Client
-============
+================
+
+[![Build Status (Scrutinizer)](https://scrutinizer-ci.com/g/Jleagle/bitly-api-client/badges/build.png)](https://scrutinizer-ci.com/g/Jleagle/bitly-api-client)
+[![Code Quality (scrutinizer)](https://scrutinizer-ci.com/g/Jleagle/bitly-api-client/badges/quality-score.png)](https://scrutinizer-ci.com/g/Jleagle/bitly-api-client)
+[![Latest Stable Version](https://poser.pugx.org/Jleagle/bitly-api-client/v/stable.png)](https://packagist.org/packages/Jleagle/bitly-api-client)
+[![Latest Unstable Version](https://poser.pugx.org/Jleagle/bitly-api-client/v/unstable.png)](https://packagist.org/packages/Jleagle/bitly-api-client)
 
 ### To use the class, you need to use one of four static methods.
 
