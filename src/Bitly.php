@@ -1,15 +1,15 @@
 <?php
-namespace Jleagle;
+namespace Jleagle\Bitly;
 
 use GuzzleHttp\Client as Guzzle;
-use Jleagle\Enums\TimeUnitEnum;
-use Jleagle\Enums\TimezoneEnum;
+use Jleagle\Bitly\Enums\TimeUnitEnum;
+use Jleagle\Bitly\Enums\TimezoneEnum;
 
 class Bitly
 {
+  const API = 'https://api-ssl.bitly.com';
 
-  private $api = 'https://api-ssl.bitly.com';
-  private $accessToken;
+  private $_accessToken;
 
   /**
    * @param string $accessToken
@@ -19,7 +19,7 @@ class Bitly
   public static function accessToken($accessToken)
   {
     $instance = new self();
-    $instance->accessToken = $accessToken;
+    $instance->_accessToken = $accessToken;
     return $instance;
   }
 
@@ -46,12 +46,19 @@ class Bitly
    * @return Bitly
    * @throws \Exception
    */
-  public static function authorize($clientId, $clientSecret, $redirectUrl, $state = null)
+  public static function authorize(
+    $clientId, $clientSecret, $redirectUrl, $state = null
+  )
   {
-    if (isset($_GET['code']) && $_GET['code'])
+    if(isset($_GET['code']) && $_GET['code'])
     {
       $instance = new self();
-      $instance->_getAccessTokenCode($clientId, $clientSecret, $_GET['code'], $redirectUrl);
+      $instance->_getAccessTokenCode(
+        $clientId,
+        $clientSecret,
+        $_GET['code'],
+        $redirectUrl
+      );
       return $instance;
     }
     else
@@ -61,7 +68,9 @@ class Bitly
         'redirect_uri' => $redirectUrl,
         'state'        => $state,
       ];
-      header('Location: https://bitly.com/oauth/authorize?'.http_build_query($data));
+
+      $url = 'https://bitly.com/oauth/authorize?' . http_build_query($data);
+      header('Location: ' . $url);
       exit;
     }
   }
@@ -99,9 +108,12 @@ class Bitly
    *
    * @return \stdClass[]
    */
-  public function search($query, $limit = 10, $offset = 0, $lang = null, $cities = null, $domain = null, $fullDomain = null, array $fields = null)
+  public function search(
+    $query, $limit = 10, $offset = 0, $lang = null, $cities = null,
+    $domain = null, $fullDomain = null, array $fields = null
+  )
   {
-    if (is_array($fields))
+    if(is_array($fields))
     {
       $fields = implode(',', $fields);
     }
@@ -393,7 +405,7 @@ class Bitly
       'edit' => implode(',', array_keys($fields)),
     ];
 
-    $data   = array_merge($data, $fields);
+    $data = array_merge($data, $fields);
     $return = $this->_request('get', '/v3/user/link_edit', $data);
 
     return $this->_checkStatusCode($return);
@@ -432,7 +444,9 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function userLinkSave($url, $title = null, $note = null, $private = null, $userTimestamp = null)
+  public function userLinkSave(
+    $url, $title = null, $note = null, $private = null, $userTimestamp = null
+  )
   {
     $data = [
       'url'     => $url,
@@ -457,7 +471,9 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function userSaveCustomDomainKeyword($keywordLink, $targetLink, $overwrite = false)
+  public function userSaveCustomDomainKeyword(
+    $keywordLink, $targetLink, $overwrite = false
+  )
   {
     // todo - make nice error codes, check docs
     $data = [
@@ -488,7 +504,10 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function linkClicks($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $rollup = false, $limit = 100)
+  public function linkClicks(
+    $link, $unit = TimeUnitEnum::DAY, $units = -1,
+    $timezone = TimezoneEnum::GMT, $rollup = false, $limit = 100
+  )
   {
     $data = [
       'link'     => $link,
@@ -518,7 +537,10 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function linkCountries($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
+  public function linkCountries(
+    $link, $unit = TimeUnitEnum::DAY, $units = -1,
+    $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null
+  )
   {
     $data = [
       'link'              => $link,
@@ -547,7 +569,10 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function linkEncoders($link, $myNetwork = false, $subAccounts = false, $limit = 10, $expandUser = false)
+  public function linkEncoders(
+    $link, $myNetwork = false, $subAccounts = false, $limit = 10,
+    $expandUser = false
+  )
   {
     $data = [
       'link'        => $link,
@@ -576,7 +601,10 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function linkEncodersByCount($link, $myNetwork = false, $subAccounts = false, $limit = 10, $expandUser = false)
+  public function linkEncodersByCount(
+    $link, $myNetwork = false, $subAccounts = false, $limit = 10,
+    $expandUser = false
+  )
   {
     $data = [
       'link'        => $link,
@@ -624,7 +652,10 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function linkReferrers($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
+  public function linkReferrers(
+    $link, $unit = TimeUnitEnum::DAY, $units = -1,
+    $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null
+  )
   {
     $data = [
       'link'              => $link,
@@ -654,7 +685,10 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function linkReferrersByDomain($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
+  public function linkReferrersByDomain(
+    $link, $unit = TimeUnitEnum::DAY, $units = -1,
+    $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null
+  )
   {
     $data = [
       'link'              => $link,
@@ -684,7 +718,10 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function linkReferringDomains($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null)
+  public function linkReferringDomains(
+    $link, $unit = TimeUnitEnum::DAY, $units = -1,
+    $timezone = TimezoneEnum::GMT, $limit = 100, $unitReferenceTs = null
+  )
   {
     $data = [
       'link'              => $link,
@@ -714,7 +751,11 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  public function linkShares($link, $unit = TimeUnitEnum::DAY, $units = -1, $timezone = TimezoneEnum::GMT, $rollup = false, $limit = 100, $unitReferenceTs = null)
+  public function linkShares(
+    $link, $unit = TimeUnitEnum::DAY, $units = -1,
+    $timezone = TimezoneEnum::GMT, $rollup = false, $limit = 100,
+    $unitReferenceTs = null
+  )
   {
     $data = [
       'link'              => $link,
@@ -733,237 +774,190 @@ class Bitly
 
   public function oauthApp()
   {
-
   }
 
   public function userInfo()
   {
-
   }
 
   public function userLinkHistory()
   {
-
   }
 
   public function userNetworkHistory()
   {
-
   }
 
   public function userTrackingDomainList()
   {
-
   }
 
   public function userClicks()
   {
-
   }
 
   public function userCountries()
   {
-
   }
 
   public function userPopularEarnedByClicks()
   {
-
   }
 
   public function userPopularEarnedByShortens()
   {
-
   }
 
   public function userPopularLinks()
   {
-
   }
 
   public function userPopularOwnedByClicks()
   {
-
   }
 
   public function userPopularOwnedByShortens()
   {
-
   }
 
   public function userReferrers()
   {
-
   }
 
   public function userReferringDomains()
   {
-
   }
 
   public function userShareCounts()
   {
-
   }
 
   public function userShareCountsByShareType()
   {
-
   }
 
   public function userShortenCounts()
   {
-
   }
 
   public function organizationBrandMessages()
   {
-
   }
 
   public function organizationClicks()
   {
-
   }
 
   public function organizationIntersectingLinks()
   {
-
   }
 
   public function organizationLeaderboard()
   {
-
   }
 
   public function organizationMissedOpportunities()
   {
-
   }
 
   public function organizationPopularLinks()
   {
-
   }
 
   public function organizationShortenCounts()
   {
-
   }
 
   public function bundleArchive()
   {
-
   }
 
   public function bundleBundlesByUser()
   {
-
   }
 
   public function bundleClone()
   {
-
   }
 
   public function bundleCollaboratorAdd()
   {
-
   }
 
   public function bundleCollaboratorRemove()
   {
-
   }
 
   public function bundleContents()
   {
-
   }
 
   public function bundleCreate()
   {
-
   }
 
   public function bundleEdit()
   {
-
   }
 
   public function bundleLinkAdd()
   {
-
   }
 
   public function bundleLinkCommentAdd()
   {
-
   }
 
   public function bundleLinkCommentEdit()
   {
-
   }
 
   public function bundleLinkCommentRemove()
   {
-
   }
 
   public function bundleLinkEdit()
   {
-
   }
 
   public function bundleLinkRemove()
   {
-
   }
 
   public function bundleLinkReorder()
   {
-
   }
 
   public function bundlePendingCollaboratorRemove()
   {
-
   }
 
   public function bundleReorder()
   {
-
   }
 
   public function bundleViewCount()
   {
-
   }
 
   public function userBundleHistory()
   {
-
   }
 
   public function bitlyProDomain()
   {
-
   }
 
   public function userTrackingDomainClicks()
   {
-
   }
 
   public function userTrackingDomainShortenCounts()
   {
-
   }
 
   public function nsqStats()
   {
-
   }
 
   /**
@@ -974,14 +968,22 @@ class Bitly
    */
   private function _getAccessTokenUsernamePassword($username, $password)
   {
-    $response = $this->_request('post', '/oauth/access_token', null, [$username, $password], false);
-    if ($this->_isJson($response))
+    $response = $this->_request(
+      'post',
+      '/oauth/access_token',
+      null,
+      [$username, $password],
+      false
+    );
+    if($this->_isJson($response))
     {
-      $response = \GuzzleHttp\json_decode($response);
-      throw new \Exception($response->status_code.': '.$response->status_txt);
+      $response = json_decode($response);
+      throw new \Exception(
+        $response->status_code . ': ' . $response->status_txt
+      );
     }
 
-    $this->accessToken = $response;
+    $this->_accessToken = $response;
   }
 
   /**
@@ -992,7 +994,9 @@ class Bitly
    *
    * @throws \Exception
    */
-  private function _getAccessTokenCode($clientId, $clientSecret, $code, $redirectUrl)
+  private function _getAccessTokenCode(
+    $clientId, $clientSecret, $code, $redirectUrl
+  )
   {
     $data = [
       'client_id'     => $clientId,
@@ -1000,17 +1004,25 @@ class Bitly
       'code'          => $code,
       'redirect_uri'  => $redirectUrl
     ];
-    $response = $this->_request('post', '/oauth/access_token', $data, [], false);
+    $response = $this->_request(
+      'post',
+      '/oauth/access_token',
+      $data,
+      [],
+      false
+    );
 
-    if ($this->_isJson($response))
+    if($this->_isJson($response))
     {
       // todo - Is this IF needed?
-      $response = \GuzzleHttp\json_decode($response);
-      throw new \Exception($response->status_code.': '.$response->status_txt);
+      $response = json_decode($response);
+      throw new \Exception(
+        $response->status_code . ': ' . $response->status_txt
+      );
     }
 
     parse_str($response, $output);
-    $this->accessToken = $output['access_token'];
+    $this->_accessToken = $output['access_token'];
   }
 
   /**
@@ -1023,24 +1035,26 @@ class Bitly
    * @return string
    * @throws \Exception
    */
-  private function _request($type = 'get', $path = '', $data = [], $auth = [], $accessToken = true)
+  private function _request(
+    $type = 'get', $path = '', $data = [], $auth = [], $accessToken = true
+  )
   {
     $client = new Guzzle();
 
     $data = array_filter($data);
 
-    if ($accessToken)
+    if($accessToken)
     {
-      $data['access_token'] = $this->accessToken;
+      $data['access_token'] = $this->_accessToken;
     }
 
-    if ($type == 'get')
+    if($type == 'get')
     {
       $getData = [
         'query' => $data,
       ];
       $getData['query']['format'] = 'json';
-      $response = $client->get($this->api.$path, $getData);
+      $response = $client->get(self::API . $path, $getData);
     }
     else
     {
@@ -1049,10 +1063,10 @@ class Bitly
         'auth'  => $auth,
       ];
       $postData['body']['format'] = 'json';
-      $response = $client->post($this->api.$path, $postData);
+      $response = $client->post(self::API . $path, $postData);
     }
 
-    if ($response->getStatusCode() != 200)
+    if($response->getStatusCode() != 200)
     {
       throw new \Exception('Status code not 200');
     }
@@ -1067,15 +1081,8 @@ class Bitly
    */
   private function _isJson($string)
   {
-    try
-    {
-      \GuzzleHttp\json_decode($string);
-      return true;
-    }
-    catch(\InvalidArgumentException $e)
-    {
-      return false;
-    }
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
   }
 
   /**
@@ -1086,8 +1093,8 @@ class Bitly
    */
   private function _checkStatusCode($data)
   {
-    $data = \GuzzleHttp\json_decode($data);
-    if ($data->status_code == 200)
+    $data = json_decode($data);
+    if($data->status_code == 200)
     {
       return $data->data;
     }
@@ -1106,5 +1113,4 @@ class Bitly
 
     return end($hash);
   }
-
 }

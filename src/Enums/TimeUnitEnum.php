@@ -1,5 +1,5 @@
 <?php
-namespace Jleagle\Enums;
+namespace Jleagle\Bitly\Enums;
 
 class TimeUnitEnum
 {

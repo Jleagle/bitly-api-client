@@ -16,12 +16,12 @@
   ],
   "autoload":    {
     "psr-4": {
-      "Jleagle\\": "src"
+      "Jleagle\\Bitly\\": "src"
     }
   },
   "require":     {
-    "php":               ">=5.4.0",
-    "packaged/helpers":  "dev-master",
-    "guzzlehttp/guzzle": "~4.0"
+    "php":               ">=5.4",
+    "packaged/helpers":  "~0",
+    "guzzlehttp/guzzle": "~5.0"
   }
 }
