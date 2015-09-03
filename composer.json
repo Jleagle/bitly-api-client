@@ -1,27 +1,27 @@
 {
-  "name":        "jleagle/bitly-api-client",
-  "keywords":    [
+  "name": "jleagle/bitly-api-client",
+  "keywords": [
     "bitly",
     "api",
     "client",
     "wrapper"
   ],
   "description": "Bitly API client.",
-  "authors":     [
+  "authors": [
     {
-      "name":     "James Eagle",
-      "email":    "jimeagle@gmail.com",
+      "name": "James Eagle",
+      "email": "jimeagle@gmail.com",
       "homepage": "http://jimeagle.com"
     }
   ],
-  "autoload":    {
+  "autoload": {
     "psr-4": {
       "Jleagle\\Bitly\\": "src"
     }
   },
-  "require":     {
-    "php":               ">=5.4",
-    "packaged/helpers":  "~0",
-    "guzzlehttp/guzzle": "~5.0"
+  "require": {
+    "php": ">=5.4",
+    "packaged/helpers": "~1.0",
+    "guzzlehttp/guzzle": "~6.0"
   }
 }
