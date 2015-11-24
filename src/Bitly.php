@@ -9,7 +9,7 @@ class Bitly
 {
   const API = 'https://api-ssl.bitly.com';
 
-  private $_accessToken;
+  protected $_accessToken;
 
   /**
    * @param string $accessToken
@@ -966,7 +966,7 @@ class Bitly
    *
    * @throws \Exception
    */
-  private function _getAccessTokenUsernamePassword($username, $password)
+  protected function _getAccessTokenUsernamePassword($username, $password)
   {
     $response = $this->_request(
       'post',
@@ -994,7 +994,7 @@ class Bitly
    *
    * @throws \Exception
    */
-  private function _getAccessTokenCode(
+  protected function _getAccessTokenCode(
     $clientId, $clientSecret, $code, $redirectUrl
   )
   {
@@ -1035,7 +1035,7 @@ class Bitly
    * @return string
    * @throws \Exception
    */
-  private function _request(
+  protected function _request(
     $type = 'get', $path = '', $data = [], $auth = [], $accessToken = true
   )
   {
@@ -1079,7 +1079,7 @@ class Bitly
    *
    * @return bool
    */
-  private function _isJson($string)
+  protected function _isJson($string)
   {
     json_decode($string);
     return (json_last_error() == JSON_ERROR_NONE);
@@ -1091,7 +1091,7 @@ class Bitly
    * @return \stdClass
    * @throws \Exception
    */
-  private function _checkStatusCode($data)
+  protected function _checkStatusCode($data)
   {
     $data = json_decode($data);
     if($data->status_code == 200)
@@ -1107,7 +1107,7 @@ class Bitly
    *
    * @return mixed
    */
-  private function _getHashFromUrl($url)
+  protected function _getHashFromUrl($url)
   {
     $hash = explode('/', $url);
 
