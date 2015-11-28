@@ -666,10 +666,14 @@ class Bitly
     }
 
     $response = $curl->run();
+    $code = $response->getHttpCode();
 
-    if($response->getHttpCode() != 200)
+    if($code != 200)
     {
-      throw new BitlyApiException('Something went wrong when talking to Bitly');
+      throw new BitlyApiException(
+        'Something went wrong when talking to Bitly',
+        $code
+      );
     }
 
     return $response;
