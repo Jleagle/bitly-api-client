@@ -154,62 +154,6 @@ class Bitly
   }
 
   /**
-   * Returns a specified number of "high-value" Bitlinks that are popular
-   * across bitly at this particular moment.
-   *
-   * @param int $limit
-   *
-   * @return array
-   */
-  public function highValue($limit = 10)
-  {
-    $data = [
-      'limit' => $limit,
-    ];
-    $return = $this->_request('get', '/v3/highvalue', $data);
-    return $this->_checkStatusCode($return);
-  }
-
-  /**
-   * Search links receiving clicks across bitly by content, language, location,
-   * and more.
-   *
-   * @param string   $query
-   * @param int      $limit
-   * @param int      $offset
-   * @param string   $lang
-   * @param string   $cities
-   * @param string   $domain
-   * @param string   $fullDomain
-   * @param string[] $fields
-   *
-   * @return array
-   */
-  public function search(
-    $query, $limit = 10, $offset = 0, $lang = null, $cities = null,
-    $domain = null, $fullDomain = null, array $fields = null
-  )
-  {
-    if(is_array($fields))
-    {
-      $fields = implode(',', $fields);
-    }
-
-    $data = [
-      'query'       => $query,
-      'limit'       => $limit,
-      'offset'      => $offset,
-      'lang'        => $lang,
-      'cities'      => $cities,
-      'domain'      => $domain,
-      'full_domain' => $fullDomain,
-      'fields'      => $fields,
-    ];
-    $return = $this->_request('get', '/v3/search', $data);
-    return $this->_checkStatusCode($return);
-  }
-
-  /**
    * Returns phrases that are receiving an uncharacteristically high volume of
    * click traffic, and the individual links (hashes) driving traffic to pages
    * containing these phrases.
@@ -267,110 +211,6 @@ class Bitly
     ];
 
     $return = $this->_request('get', '/v3/link/info', $data);
-
-    return $this->_checkStatusCode($return);
-  }
-
-  /**
-   * Returns the “main article” from the linked page, as determined by the
-   * content extractor, in either HTML or plain text format.
-   *
-   * @param string $link
-   * @param string $contentType
-   *
-   * @return array
-   */
-  public function linkContent($link, $contentType = 'html')
-  {
-    $data = [
-      'link'         => $link,
-      'content_type' => $contentType,
-    ];
-
-    $return = $this->_request('get', '/v3/link/content', $data);
-
-    return $this->_checkStatusCode($return);
-  }
-
-  /**
-   * Returns the detected categories for a document, in descending order of
-   * confidence.
-   *
-   * @param string $link
-   *
-   * @return array
-   */
-  public function linkCategory($link)
-  {
-    $data = [
-      'link' => $link,
-    ];
-
-    $return = $this->_request('get', '/v3/link/category', $data);
-
-    return $this->_checkStatusCode($return);
-  }
-
-  /**
-   * Returns the "social score" for a specified Bitlink. Note that the social
-   * score are highly dependent upon activity (clicks) occurring on the Bitlink.
-   * If there have not been clicks on a Bitlink within the last 24 hours, it is
-   * possible a social score for that link does not exist.
-   *
-   * @param string $link
-   *
-   * @return array
-   */
-  public function linkSocial($link)
-  {
-    $data = [
-      'link' => $link,
-    ];
-
-    $return = $this->_request('get', '/v3/link/social', $data);
-
-    return $this->_checkStatusCode($return);
-  }
-
-  /**
-   * Returns the significant locations for the Bitlink or None if locations do
-   * not exist. Note that locations are highly dependent upon activity (clicks)
-   * occurring on the Bitlink. If there have not been clicks on a Bitlink within
-   * the last 24 hours, it is possible that location data for that link does not
-   * exist.
-   *
-   * @param string $link
-   *
-   * @return array
-   */
-  public function linkLocation($link)
-  {
-    $data = [
-      'link' => $link,
-    ];
-
-    $return = $this->_request('get', '/v3/link/location', $data);
-
-    return $this->_checkStatusCode($return);
-  }
-
-  /**
-   * Returns the significant languages for the Bitlink. Note that languages are
-   * highly dependent upon activity (clicks) occurring on the Bitlink. If there
-   * have not been clicks on a Bitlink within the last 24 hours, it is possible
-   * that language data for that link does not exist.
-   *
-   * @param string $link
-   *
-   * @return array
-   */
-  public function linkLanguage($link)
-  {
-    $data = [
-      'link' => $link,
-    ];
-
-    $return = $this->_request('get', '/v3/link/language', $data);
 
     return $this->_checkStatusCode($return);
   }
@@ -789,40 +629,6 @@ class Bitly
   }
 
   /**
-   * Returns metrics about a shares of a single link.
-   *
-   * @param string $link
-   * @param string $unit     - Use the TimeUnitEnum enum
-   * @param int    $units
-   * @param string $timezone - Use the TimezoneEnum enum
-   * @param bool   $rollup
-   * @param int    $limit
-   * @param int    $unitReferenceTs
-   *
-   * @return array
-   */
-  public function linkShares(
-    $link, $unit = TimeUnitEnum::DAY, $units = -1,
-    $timezone = TimezoneEnum::GMT, $rollup = false, $limit = 100,
-    $unitReferenceTs = null
-  )
-  {
-    $data = [
-      'link'              => $link,
-      'unit'              => $unit,
-      'units'             => $units,
-      'timezone'          => $timezone,
-      'rollup'            => $rollup ? 'true' : 'false',
-      'limit'             => $limit,
-      'unit_reference_ts' => $unitReferenceTs,
-    ];
-
-    $return = $this->_request('get', '/v3/link/shares', $data);
-
-    return $this->_checkStatusCode($return);
-  }
-
-  /**
    * @param string $type
    * @param string $path
    * @param array  $data
@@ -860,8 +666,6 @@ class Bitly
     }
 
     $response = $curl->run();
-
-    //print_r($response->getUrl());die;
 
     if($response->getHttpCode() != 200)
     {
