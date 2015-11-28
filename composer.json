@@ -20,7 +20,7 @@
   },
   "require": {
     "php": ">=5.4",
-    "packaged/helpers": "~1.0",
-    "guzzlehttp/guzzle": "~6.0"
+    "packaged/helpers": "~1.1",
+    "jleagle/curl-wrapper": "~0.1"
   }
 }
